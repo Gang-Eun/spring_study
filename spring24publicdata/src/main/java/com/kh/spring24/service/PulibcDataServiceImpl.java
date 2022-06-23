@@ -10,11 +10,15 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.kh.spring24.vo.Covid19ChartVO;
 import com.kh.spring24.vo.Covid19ResponseDataVO;
 import com.kh.spring24.vo.Covid19ResponseVO;
 import com.kh.spring24.vo.Covid19VO;
+import com.kh.spring24.vo.HospitalResponseVO;
+import com.kh.spring24.vo.HospitalVO;
 
 @Service
 public class PulibcDataServiceImpl implements PublicDataService{
@@ -64,5 +68,21 @@ public class PulibcDataServiceImpl implements PublicDataService{
 								.count(List.of(data.getCnt1(), data.getCnt2(), data.getCnt3(), data.getCnt4(), data.getCnt5(), data.getCnt6(), data.getCnt7(), data.getCnt8()))
 								.rate(List.of(data.getRate1(), data.getRate2(), data.getRate3(), data.getRate4(), data.getRate5(), data.getRate6(), data.getRate7(), data.getRate8()))
 							.build(); 
+	}
+	
+	@Override
+	public List<HospitalVO> getChungBukHospital() throws URISyntaxException, JsonMappingException, JsonProcessingException {
+		RestTemplate template = new RestTemplate();
+		URI uri = new URI("https://www.chungbuk.go.kr/openapi-json/pubdata/pubMapEmergency.do?numOfRows=1000&pageNo=1");
+		String result = template.getForObject(uri, String.class);
+		result = result.replace("\\", "");
+		result = result.substring(1, result.length() -1);
+		
+		ObjectMapper mapper = JsonMapper.builder()
+										.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+										.build();
+		HospitalResponseVO responseVO = mapper.readValue(result, HospitalResponseVO.class);
+		
+		return responseVO.getResponse(); 
 	}
 }

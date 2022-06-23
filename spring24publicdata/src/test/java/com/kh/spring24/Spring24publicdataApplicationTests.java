@@ -9,10 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.kh.spring24.vo.Covid19ResponseVO;
 import com.kh.spring24.vo.Covid19VO;
+import com.kh.spring24.vo.HospitalResponseVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest
 class Spring24publicdataApplicationTests {
 
-	@Test
+//	@Test
 	void contextLoads() throws URISyntaxException, JsonMappingException, JsonProcessingException {
 		// Java에서 Http 요청을 발생시켜 공공데이터포탈의 데이터를 조회
 		// 1. HttpUrlConnection 사용(자바 표준 API)
@@ -47,5 +51,20 @@ class Spring24publicdataApplicationTests {
 		Covid19VO responseVO = mapper.readValue(text, Covid19VO.class);
 		log.info("responseVO = {}", responseVO);
 	}
-
+	
+	@Test
+	public void hospital() throws URISyntaxException, JsonMappingException, JsonProcessingException {
+		RestTemplate template = new RestTemplate();
+		URI uri = new URI("https://www.chungbuk.go.kr/openapi-json/pubdata/pubMapEmergency.do?numOfRows=1000&pageNo=1");
+		String result = template.getForObject(uri, String.class);
+		result = result.replace("\\", "");
+		result = result.substring(1, result.length() -1);
+		log.info("result = {}", result);
+		
+		ObjectMapper mapper = JsonMapper.builder()
+										.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+										.build();
+		HospitalResponseVO responseVO = mapper.readValue(result, HospitalResponseVO.class);
+		log.info("responseVO = {}", responseVO);
+	}
 }

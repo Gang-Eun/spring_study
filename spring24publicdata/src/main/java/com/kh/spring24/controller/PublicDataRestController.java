@@ -2,6 +2,7 @@ package com.kh.spring24.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.spring24.service.PublicDataService;
 import com.kh.spring24.vo.Covid19ChartVO;
 import com.kh.spring24.vo.Covid19VO;
+import com.kh.spring24.vo.HospitalResponseVO;
+import com.kh.spring24.vo.HospitalVO;
 
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
-public class Covid19RestController {
+public class PublicDataRestController {
 
 	
 	@Autowired
@@ -35,5 +38,10 @@ public class Covid19RestController {
 	@GetMapping("/covid19/confirm/chart")
 	public Covid19ChartVO covid19ConfirmChart() throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		return publicDataService.getCovid19ConfrimChartData();
+	}
+	
+	@GetMapping("/hospital/chungbuk")
+	public List<HospitalVO> getHospitalListInChungBuk() throws JsonMappingException, JsonProcessingException, URISyntaxException {
+		return publicDataService.getChungBukHospital();
 	}
 }
